@@ -1,7 +1,9 @@
 import { Matrix4, degToRad } from "./maths";
-import { ColorRGBA, Position, Rotation } from "./engine/type";
+import { ColorRGBA } from "./engine/type";
 
 import Engine from "./engine";
+import Shaders from "./engine/Shaders";
+import Shapes from "./engine/Shapes";
 
 import { App } from "./App";
 
@@ -62,8 +64,12 @@ window.addEventListener("DOMContentLoaded", () => {
   // test(engine, matrix, SCENE_OPTIONS.pixelSize);
 
   //
-  const position: Position = [0, 0, 0];
-  let rotation: Rotation = { x: 10, y: 0, z: 0 };
+  let rubik = Rubik(
+    SCENE_OPTIONS.pixelSize,
+    [0, 0, 0],
+    { x: 0, y: 0, z: 0 },
+    Object.values(COLORS) as RubikColors
+  );
 
   //
   const interval = 100;
@@ -81,17 +87,18 @@ window.addEventListener("DOMContentLoaded", () => {
     ) {
       timestamp = currentTime;
 
-      rotation.x++;
-      rotation.y--;
-      rotation.z++;
+      rubik[0].rotation.x++;
+      rubik[0].rotation.y--;
+      rubik[0].rotation.z++;
 
-      Rubik(
+      engine.clearCanvas();
+
+      Shapes.render(
         engine,
-        matrix,
-        SCENE_OPTIONS.pixelSize,
-        position,
-        rotation,
-        Object.values(COLORS) as RubikColors
+        rubik,
+        Shaders.vertexShader,
+        Shaders.fragmentShader,
+        matrix
       );
     }
 

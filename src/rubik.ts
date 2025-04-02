@@ -1,8 +1,6 @@
 import { ColorRGBA, Position, Rotation } from "./engine/type";
 
-import Engine, { ObjectData } from "./engine";
-import Shaders from "./engine/Shaders";
-
+import { ObjectData } from "./engine";
 import Shapes from "./engine/Shapes";
 
 type RubikColors = [
@@ -15,15 +13,11 @@ type RubikColors = [
 ];
 
 export default function (
-  engine: Engine,
-  matrix: number[],
   pixelSize: number,
   position: Position,
   rotation: Rotation,
   colors: RubikColors
-) {
-  engine.clearCanvas();
-
+): ObjectData[] {
   const spacing = 10;
   const sideLength = 3 * pixelSize + 4 * spacing;
   const facesCallback: ((row: number, column: number) => ObjectData)[] = [
@@ -203,17 +197,15 @@ export default function (
     },
   ];
 
-  facesCallback.map((callback) => {
-    Shapes.render(
-      engine,
-      Array(9)
+  return facesCallback.reduce(
+    (_result, callback) => [
+      ..._result,
+      ...Array(9)
         .fill(0)
         .map((_, index) => callback(index % 3, Math.floor(index / 3))),
-      Shaders.vertexShader,
-      Shaders.fragmentShader,
-      matrix
-    );
-  });
+    ],
+    [] as ObjectData[]
+  );
 }
 
 export { RubikColors };
