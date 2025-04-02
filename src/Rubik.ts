@@ -3,13 +3,27 @@ import { ColorRGBA, Position, Rotation } from "./engine/type";
 import { ObjectData } from "./engine";
 import Shapes from "./engine/Shapes";
 
-type RubikColors = [
+type FaceColors = [
   ColorRGBA,
   ColorRGBA,
   ColorRGBA,
+  //
+  ColorRGBA,
+  ColorRGBA,
+  ColorRGBA,
+  //
   ColorRGBA,
   ColorRGBA,
   ColorRGBA
+];
+type RubikColors = [
+  FaceColors,
+  FaceColors,
+  FaceColors,
+  //
+  FaceColors,
+  FaceColors,
+  FaceColors
 ];
 
 export default function (
@@ -20,9 +34,13 @@ export default function (
 ): ObjectData[] {
   const spacing = 10;
   const sideLength = 3 * pixelSize + 4 * spacing;
-  const facesCallback: ((row: number, column: number) => ObjectData)[] = [
+  const facesCallback: ((
+    index: number,
+    row: number,
+    column: number
+  ) => ObjectData)[] = [
     // up
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         z: sideLength - spacing - row * (pixelSize + spacing),
         y: -spacing,
@@ -44,14 +62,14 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: colors[0],
+            color: colors[0][index],
           },
         ],
         3
       );
     },
     // left
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         x: 0,
         y: column * (pixelSize + spacing),
@@ -73,14 +91,14 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[1],
+            color: colors[1][index],
           },
         ],
         3
       );
     },
     // front
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         z: 0,
         y: column * (pixelSize + spacing),
@@ -102,14 +120,14 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[2],
+            color: colors[2][index],
           },
         ],
         3
       );
     },
     // right
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         x: sideLength + spacing,
         y: column * (pixelSize + spacing),
@@ -131,14 +149,14 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[3],
+            color: colors[3][index],
           },
         ],
         3
       );
     },
     // down
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         x: column * (pixelSize + spacing) + spacing,
         y: sideLength - spacing,
@@ -160,14 +178,14 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: colors[4],
+            color: colors[4][index],
           },
         ],
         3
       );
     },
     // back
-    (row: number, column: number) => {
+    (index: number, row: number, column: number) => {
       const start = {
         z: sideLength,
         y: column * (pixelSize + spacing),
@@ -189,7 +207,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[5],
+            color: colors[5][index],
           },
         ],
         3
@@ -202,10 +220,10 @@ export default function (
       ..._result,
       ...Array(9)
         .fill(0)
-        .map((_, index) => callback(index % 3, Math.floor(index / 3))),
+        .map((_, index) => callback(index, index % 3, Math.floor(index / 3))),
     ],
     [] as ObjectData[]
   );
 }
 
-export { RubikColors };
+export { FaceColors, RubikColors };

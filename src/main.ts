@@ -1,4 +1,4 @@
-import { Matrix4, degToRad } from "./maths";
+import { Matrix4 } from "./maths";
 import { ColorRGBA } from "./engine/type";
 
 import Engine from "./engine";
@@ -7,42 +7,31 @@ import Shapes from "./engine/Shapes";
 
 import { App } from "./App";
 
-// import test from "./test";
-import Rubik, { RubikColors } from "./rubik";
+import Rubik, { RubikColors } from "./Rubik";
+import Cube from "./cube";
 
-const SCENE_OPTIONS = {
-  width: 800,
-  height: 600,
-  pixelSize: 100,
-  backgroundColor: [0.5, 0.5, 0.5, 1],
-};
-const CAMERA_OPTIONS = {
-  radius: 400,
-  aspect: SCENE_OPTIONS.width / SCENE_OPTIONS.height,
-  zNear: 1,
-  zFar: 2000,
-  fieldOfView: degToRad(120),
-  angle: degToRad(0),
-};
-const COLORS: { [key: string]: ColorRGBA } = {
-  WHITE: [1, 1, 1, 1],
-  GREEN: [0, 1, 0, 1],
-  RED: [1, 0, 0, 1],
-  ORANGE: [1, 0.5, 0, 1],
-  YELLOW: [1, 1, 0, 1],
-  BLUE: [0, 0.5, 1, 1],
-};
+import { SCENE_OPTIONS, CAMERA_OPTIONS, COLORS } from "./options";
+import Controls from "./Controls";
 
 window.addEventListener("DOMContentLoaded", () => {
   const app = new App("app-container");
   app.render();
 
   const $scene: HTMLCanvasElement = app.$container.querySelector("#scene")!;
+  const $controls: HTMLElement = app.$container.querySelector(".controls")!;
+
   const engine = new Engine($scene, {
     width: SCENE_OPTIONS.width,
     height: SCENE_OPTIONS.height,
     backgroundColor: SCENE_OPTIONS.backgroundColor as ColorRGBA,
   });
+  const controls = new Controls($controls, {
+    up: $controls.querySelector(".controls__button--up")!,
+    left: $controls.querySelector(".controls__button--left")!,
+    right: $controls.querySelector(".controls__button--right")!,
+    down: $controls.querySelector(".controls__button--down")!,
+  });
+  let cube = new Cube();
 
   const projectionMatrix: number[] = Matrix4.perspective(
     CAMERA_OPTIONS.fieldOfView,
@@ -60,22 +49,35 @@ window.addEventListener("DOMContentLoaded", () => {
   );
   const matrix = Matrix4.multiply(projectionMatrix, viewMatrix);
 
-  // test engine/shapes
-  // test(engine, matrix, SCENE_OPTIONS.pixelSize);
-
-  //
-  let rubik = Rubik(
-    SCENE_OPTIONS.pixelSize,
-    [0, 0, 0],
-    { x: 0, y: 0, z: 0 },
-    Object.values(COLORS) as RubikColors
-  );
-
   //
   const interval = 100;
   const startTime = Date.now();
   let loop = 0;
   let timestamp = startTime;
+
+  controls.$container.addEventListener("rotate", (event: any) => {
+    switch (event.detail || "") {
+      case "up":
+        cube.rotateFaces({ x: 0, y: 1, z: 0 });
+        break;
+
+      case "left":
+        cube.rotateFaces({ x: -1, y: 0, z: 0 });
+        break;
+
+      case "right":
+        cube.rotateFaces({ x: 1, y: 0, z: 0 });
+        break;
+
+      case "down":
+        cube.rotateFaces({ x: 0, y: -1, z: 0 });
+        break;
+
+      default:
+        //
+        break;
+    }
+  });
 
   const animate: FrameRequestCallback = () => {
     const currentTime = Date.now();
@@ -87,11 +89,24 @@ window.addEventListener("DOMContentLoaded", () => {
     ) {
       timestamp = currentTime;
 
-      rubik[0].rotation.x++;
-      rubik[0].rotation.y--;
-      rubik[0].rotation.z++;
-
       engine.clearCanvas();
+
+      // avoid to re-compute at each iteration
+      const rubik = Rubik(
+        SCENE_OPTIONS.pixelSize,
+        cube.position,
+        cube.rotation,
+        cube.cubeData.map((face) => {
+          return face.reduce((_result, row) => {
+            return [
+              ..._result,
+              ...row.map(
+                (cellValue) => Object.values(COLORS)[Number(cellValue) - 1]
+              ),
+            ];
+          }, [] as ColorRGBA[]);
+        }) as RubikColors
+      );
 
       Shapes.render(
         engine,
