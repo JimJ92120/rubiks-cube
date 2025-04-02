@@ -58,7 +58,7 @@ type RotationMove = {
 };
 
 class Cube {
-  _rotation: Rotation = {
+  private _rotationCount: Rotation = {
     x: 0,
     y: 0,
     z: 0,
@@ -109,7 +109,7 @@ class Cube {
   }
 
   get rotation(): Rotation {
-    const { x, y, z } = this._rotation;
+    const { x, y, z } = this._rotationCount;
 
     return {
       x: x * 90,
@@ -186,21 +186,21 @@ class Cube {
   }
 
   private updateRotation(rotationMove: RotationMove): void {
-    const { x, y, z } = this._rotation;
+    const { x, y, z } = this._rotationCount;
 
-    this._rotation = {
+    this._rotationCount = {
       x: x + (rotationMove.x || 0),
       y: y + (rotationMove.y || 0),
       z: z + (rotationMove.z || 0),
     };
 
-    Object.keys(this._rotation).map((rotationKey) => {
-      const rotationValue = this._rotation[rotationKey as keyof Rotation];
+    Object.keys(this._rotationCount).map((rotationKey) => {
+      const rotationValue = this._rotationCount[rotationKey as keyof Rotation];
 
       if (0 > rotationValue) {
-        this._rotation[rotationKey as keyof Rotation] = 3;
+        this._rotationCount[rotationKey as keyof Rotation] = 3;
       } else if (3 < rotationValue) {
-        this._rotation[rotationKey as keyof Rotation] = 0;
+        this._rotationCount[rotationKey as keyof Rotation] = 0;
       }
     });
   }
@@ -320,3 +320,5 @@ class Cube {
 }
 
 export default Cube;
+
+export { RotationMove };

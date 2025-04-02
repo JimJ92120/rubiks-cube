@@ -28,11 +28,11 @@ type RubikColors = [
 
 export default function (
   pixelSize: number,
+  spacing: number,
   position: Position,
   rotation: Rotation,
   colors: RubikColors
 ): ObjectData[] {
-  const spacing = 10;
   const sideLength = 3 * pixelSize + 4 * spacing;
   const facesCallback: ((
     index: number,

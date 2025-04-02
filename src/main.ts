@@ -3,34 +3,48 @@ import { ColorRGBA } from "./engine/type";
 
 import Engine from "./engine";
 import Shaders from "./engine/Shaders";
-import Shapes from "./engine/Shapes";
+import Shapes, { CubeData } from "./engine/Shapes";
 
 import { App } from "./App";
 
 import Rubik, { RubikColors } from "./Rubik";
-import Cube from "./cube";
+import Cube, { RotationMove } from "./cube";
 
 import { SCENE_OPTIONS, CAMERA_OPTIONS, COLORS } from "./options";
-import Controls from "./Controls";
+import Controls, { MoveControls } from "./Controls";
 
 window.addEventListener("DOMContentLoaded", () => {
   const app = new App("app-container");
   app.render();
 
   const $scene: HTMLCanvasElement = app.$container.querySelector("#scene")!;
-  const $controls: HTMLElement = app.$container.querySelector(".controls")!;
+  const $controls: HTMLElement = app.$container.querySelector("#controls")!;
 
   const engine = new Engine($scene, {
     width: SCENE_OPTIONS.width,
     height: SCENE_OPTIONS.height,
     backgroundColor: SCENE_OPTIONS.backgroundColor as ColorRGBA,
   });
-  const controls = new Controls($controls, {
-    up: $controls.querySelector(".controls__button--up")!,
-    left: $controls.querySelector(".controls__button--left")!,
-    right: $controls.querySelector(".controls__button--right")!,
-    down: $controls.querySelector(".controls__button--down")!,
-  });
+  const controls = new Controls(
+    $controls,
+    {
+      up: $controls.querySelector(".rotation-controls__button--up")!,
+      left: $controls.querySelector(".rotation-controls__button--left")!,
+      right: $controls.querySelector(".rotation-controls__button--right")!,
+      down: $controls.querySelector(".rotation-controls__button--down")!,
+    },
+    {
+      direction: $controls.querySelector(".move-controls__direction")!,
+      positions: Array(3)
+        .fill(0)
+        .map(
+          (_, index) =>
+            $controls.querySelector(
+              `.move-controls__position-button[position-index="${index}"]`
+            )!
+        ) as MoveControls["positions"],
+    }
+  );
   let cube = new Cube();
 
   const projectionMatrix: number[] = Matrix4.perspective(
@@ -74,9 +88,51 @@ window.addEventListener("DOMContentLoaded", () => {
         break;
 
       default:
-        //
         break;
     }
+  });
+
+  controls.$container.addEventListener("move", (event: any) => {
+    if (!event.detail) {
+      return;
+    }
+
+    const { direction, positionIndex } = event.detail;
+    let move: RotationMove = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+
+    switch (direction) {
+      case "up":
+        move.y = 1;
+        break;
+
+      case "left":
+        move.x = 1;
+        break;
+
+      case "right":
+        move.x = -1;
+        break;
+
+      case "down":
+        move.y = -1;
+        break;
+
+      default:
+        break;
+    }
+
+    cube.rotateCube(
+      {
+        x: 2 - positionIndex, // 90, 180 reversed
+        y: positionIndex,
+        z: 0,
+      },
+      move
+    );
   });
 
   const animate: FrameRequestCallback = () => {
@@ -94,6 +150,7 @@ window.addEventListener("DOMContentLoaded", () => {
       // avoid to re-compute at each iteration
       const rubik = Rubik(
         SCENE_OPTIONS.pixelSize,
+        SCENE_OPTIONS.spacing,
         cube.position,
         cube.rotation,
         cube.cubeData.map((face) => {
@@ -107,10 +164,24 @@ window.addEventListener("DOMContentLoaded", () => {
           }, [] as ColorRGBA[]);
         }) as RubikColors
       );
+      // const background = Shapes["3d"].Cube(
+      //   {
+      //     position: [0, 0, 0],
+      //     size: SCENE_OPTIONS.pixelSize * 3 + SCENE_OPTIONS.spacing * 2,
+      //     rotation: cube.rotation,
+      //     colors: Array(6)
+      //       .fill(0)
+      //       .map(() => [0, 0, 0, 1]) as CubeData["colors"],
+      //   },
+      //   3
+      // );
 
       Shapes.render(
         engine,
-        rubik,
+        [
+          // ...background,
+          ...rubik,
+        ],
         Shaders.vertexShader,
         Shaders.fragmentShader,
         matrix

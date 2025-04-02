@@ -1,58 +1,85 @@
-type Buttons = {
+type RotationControls = {
   up: HTMLButtonElement;
   left: HTMLButtonElement;
   right: HTMLButtonElement;
   down: HTMLButtonElement;
 };
 
+type MoveControls = {
+  positions: [HTMLButtonElement, HTMLButtonElement, HTMLButtonElement];
+  direction: HTMLSelectElement;
+};
+
 // to WebComponent
 class Controls {
   $container: HTMLElement;
-  $buttons: Buttons;
+  $rotationControls: RotationControls;
+  $moveControls: MoveControls;
 
-  constructor($container: HTMLElement, $buttons: Buttons) {
+  constructor(
+    $container: HTMLElement,
+    $rotationControls: RotationControls,
+    $moveControls: MoveControls
+  ) {
     this.$container = $container;
-    this.$buttons = $buttons;
+    this.$rotationControls = $rotationControls;
+    this.$moveControls = $moveControls;
 
-    Object.keys(this.$buttons).map((buttonKey) => {
-      const $button = this.$buttons[buttonKey as keyof Buttons];
+    this.setRotationEvents();
+    this.setMoveEvents();
+  }
 
-      $button.addEventListener("click", (event) =>
-        this.onButtonClicked(event as PointerEvent)
-      );
+  private setMoveEvents(): void {
+    this.$moveControls.positions.map(($button: HTMLButtonElement) => {
+      $button.addEventListener("click", (event) => {
+        const direction = this.$moveControls.direction.value;
+        const positionIndex = Number($button.getAttribute("position-index"));
+
+        if (!direction || isNaN(positionIndex)) {
+          return;
+        }
+
+        this.dispatchEvent("move", {
+          direction,
+          positionIndex,
+        });
+      });
     });
   }
 
-  private onButtonClicked(event: PointerEvent): void {
-    if (!event.target) {
-      return;
-    }
+  private setRotationEvents(): void {
+    Object.keys(this.$rotationControls).map((buttonKey) => {
+      const $button =
+        this.$rotationControls[buttonKey as keyof RotationControls];
 
-    switch (event.target) {
-      case this.$buttons.up:
-        this.dispatchRotationEvent("up");
-        break;
+      $button.addEventListener("click", (event) => {
+        if (!event.target) {
+          return;
+        }
 
-      case this.$buttons.left:
-        this.dispatchRotationEvent("left");
-        break;
+        switch (event.target) {
+          case this.$rotationControls.up:
+            this.dispatchEvent("rotate", "up");
+            break;
 
-      case this.$buttons.right:
-        this.dispatchRotationEvent("right");
-        break;
+          case this.$rotationControls.left:
+            this.dispatchEvent("rotate", "left");
+            break;
 
-      case this.$buttons.down:
-        this.dispatchRotationEvent("down");
-        break;
+          case this.$rotationControls.right:
+            this.dispatchEvent("rotate", "right");
+            break;
 
-      default:
-        //
-        break;
-    }
-  }
+          case this.$rotationControls.down:
+            this.dispatchEvent("rotate", "down");
+            break;
 
-  private dispatchRotationEvent(rotationDirection: string): void {
-    this.dispatchEvent("rotate", rotationDirection);
+          default:
+            //
+            break;
+        }
+      });
+    });
   }
 
   private dispatchEvent(eventName: string, data: any): void {
@@ -65,3 +92,5 @@ class Controls {
 }
 
 export default Controls;
+
+export { RotationControls, MoveControls };

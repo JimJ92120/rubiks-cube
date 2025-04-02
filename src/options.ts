@@ -2,13 +2,14 @@ import { degToRad } from "./maths";
 import { ColorRGBA } from "./engine/type";
 
 const SCENE_OPTIONS = {
-  width: 800,
-  height: 600,
+  width: 600,
+  height: 400,
   pixelSize: 100,
+  spacing: 10,
   backgroundColor: [0.5, 0.5, 0.5, 1],
 };
 const CAMERA_OPTIONS = {
-  radius: 400,
+  radius: 500,
   aspect: SCENE_OPTIONS.width / SCENE_OPTIONS.height,
   zNear: 1,
   zFar: 2000,
