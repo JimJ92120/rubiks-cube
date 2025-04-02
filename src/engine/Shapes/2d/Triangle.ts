@@ -1,6 +1,6 @@
 import { ColorRGBA, Position, Rotation } from "../../type";
 import { ObjectData } from "../../index";
-import { Matrix4, degToRad } from "../../../maths";
+import { Matrix4 } from "../../../maths";
 
 type TriangleData = {
   position: Position;
@@ -27,19 +27,6 @@ function translate(data: number[]): number[] {
   return data;
 }
 
-function getTranslatedMatrix(
-  matrix: number[],
-  position: Position,
-  rotation: Rotation
-) {
-  matrix = Matrix4.translate(matrix, position[0], position[1], position[2]);
-  matrix = Matrix4.xRotate(matrix, degToRad(rotation.y));
-  matrix = Matrix4.yRotate(matrix, degToRad(rotation.x));
-  matrix = Matrix4.zRotate(matrix, degToRad(rotation.z));
-
-  return matrix;
-}
-
 export default function (data: TriangleData[], vertexSize: number): ObjectData {
   const [triangles, colors]: [number[], number[]] = data.reduce(
     (_result, triangleData) =>
@@ -60,26 +47,6 @@ export default function (data: TriangleData[], vertexSize: number): ObjectData {
     [[], []] as [number[], number[]]
   );
 
-  // engine.renderTriangles(
-  //   {
-  //     a_color: {
-  //       vertices: colors,
-  //       vertexSize: 4,
-  //     },
-  //     a_position: {
-  //       vertices: translate(triangles),
-  //       vertexSize,
-  //     },
-  //   },
-  //   triangles.length * vertexSize,
-  //   vertexShaderSource,
-  //   fragmentShaderSource,
-  //   getTranslatedMatrix(
-  //     viewProjectionMatrix,
-  //     data[0].position,
-  //     data[0].rotation
-  //   )
-  // );
   return {
     attributesData: {
       a_color: {
@@ -91,7 +58,7 @@ export default function (data: TriangleData[], vertexSize: number): ObjectData {
         vertexSize,
       },
     },
-    verticesCount: triangles.length * vertexSize,
+    verticesCount: triangles.length / vertexSize,
     position: data[0].position,
     rotation: data[0].rotation,
   };
