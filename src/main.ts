@@ -6,7 +6,7 @@ import Engine from "./engine";
 import { App } from "./App";
 
 // import test from "./test";
-import Rubik from "./rubik";
+import Rubik, { RubikColors } from "./rubik";
 
 const SCENE_OPTIONS = {
   width: 800,
@@ -21,6 +21,14 @@ const CAMERA_OPTIONS = {
   zFar: 2000,
   fieldOfView: degToRad(120),
   angle: degToRad(0),
+};
+const COLORS: { [key: string]: ColorRGBA } = {
+  WHITE: [1, 1, 1, 1],
+  GREEN: [0, 1, 0, 1],
+  RED: [1, 0, 0, 1],
+  ORANGE: [1, 0.5, 0, 1],
+  YELLOW: [1, 1, 0, 1],
+  BLUE: [0, 0.5, 1, 1],
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -77,7 +85,14 @@ window.addEventListener("DOMContentLoaded", () => {
       rotation.y--;
       rotation.z++;
 
-      Rubik(engine, matrix, SCENE_OPTIONS.pixelSize, position, rotation);
+      Rubik(
+        engine,
+        matrix,
+        SCENE_OPTIONS.pixelSize,
+        position,
+        rotation,
+        Object.values(COLORS) as RubikColors
+      );
     }
 
     loop = requestAnimationFrame(animate);
