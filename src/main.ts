@@ -3,7 +3,7 @@ import { ColorRGBA } from "./engine/type";
 
 import Engine from "./engine";
 import Shaders from "./engine/Shaders";
-import Shapes, { CubeData } from "./engine/Shapes";
+import Shapes from "./engine/Shapes";
 
 import { App } from "./App";
 
@@ -43,7 +43,8 @@ window.addEventListener("DOMContentLoaded", () => {
               `.move-controls__position-button[position-index="${index}"]`
             )!
         ) as MoveControls["positions"],
-    }
+    },
+    $controls.querySelector(".scramble-controls")!
   );
   let cube = new Cube();
 
@@ -133,6 +134,10 @@ window.addEventListener("DOMContentLoaded", () => {
       },
       move
     );
+  });
+
+  controls.$container.addEventListener("scramble", () => {
+    cube.scramble(20);
   });
 
   const animate: FrameRequestCallback = () => {

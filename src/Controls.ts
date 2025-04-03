@@ -15,18 +15,28 @@ class Controls {
   $container: HTMLElement;
   $rotationControls: RotationControls;
   $moveControls: MoveControls;
+  $scrambleControls: HTMLButtonElement;
 
   constructor(
     $container: HTMLElement,
     $rotationControls: RotationControls,
-    $moveControls: MoveControls
+    $moveControls: MoveControls,
+    $scrambleControls: HTMLButtonElement
   ) {
     this.$container = $container;
     this.$rotationControls = $rotationControls;
     this.$moveControls = $moveControls;
+    this.$scrambleControls = $scrambleControls;
 
     this.setRotationEvents();
     this.setMoveEvents();
+    this.setScrambleEvents();
+  }
+
+  private setScrambleEvents(): void {
+    this.$scrambleControls.addEventListener("click", () => {
+      this.dispatchEvent("scramble", null);
+    });
   }
 
   private setMoveEvents(): void {

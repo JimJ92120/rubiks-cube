@@ -13,6 +13,8 @@ class App {
   <canvas id="scene"></canvas>
 
   <div id="controls">
+    <button class="scramble-controls">Scramble</button>
+
     <p>Rotate:</p>
     <div class="rotation-controls">
       <button class="rotation-controls__button rotation-controls__button--up">\V</button>
@@ -45,6 +47,9 @@ class App {
   <div>
 
   <style>
+    #controls {
+      margin-top: 2rem;
+    }
     .rotation-controls,
     .move-controls {
       font-size: 1.25rem;

@@ -118,7 +118,66 @@ class Cube {
     };
   }
 
-  // scramble(): void;
+  scramble(moveCount: number): void {
+    const random2Axis = () =>
+      ["x", "y"][Math.floor(Math.random() * 2)] as keyof RotationMove;
+    const random3 = () => Math.floor(Math.random() * 3);
+    const randomPositiveNegative = () =>
+      Math.floor(Math.random() * 1) ? -1 : 1;
+
+    Array(moveCount)
+      .fill(0)
+      .map((_, index) => {
+        if (!(index % 3)) {
+          this.rotateFaces({
+            ...{ x: 0, y: 0, z: 0 },
+            ...{ [random2Axis()]: randomPositiveNegative() },
+          });
+        }
+
+        this.rotateCube(
+          {
+            x: random3(),
+            y: random3(),
+            z: 0,
+          },
+          {
+            ...{
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            ...{
+              [random2Axis()]: randomPositiveNegative,
+            },
+          }
+        );
+      });
+
+    if (0 !== this._rotationCount.x) {
+      Array(this._rotationCount.x)
+        .fill(0)
+        .map(() => {
+          this.rotateFaces({
+            x: -1,
+            y: 0,
+            z: 0,
+          });
+        });
+    }
+
+    if (0 !== this._rotationCount.y) {
+      Array(this._rotationCount.y)
+        .fill(0)
+        .map(() => {
+          this.rotateFaces({
+            x: 0,
+            y: -1,
+            z: 0,
+          });
+        });
+    }
+  }
 
   rotateFaces(rotationMove: RotationMove): void {
     this.updateFaceMap(rotationMove);
