@@ -140,13 +140,16 @@ export default function (
     (index: number, row: number, column: number) => {
       const offset = {
         x: -pixelSize - spacing,
-        y: -pixelSize,
-        z: 0,
+        y: spacing,
+        z: pixelSize + spacing,
       };
       const start = {
         x: offset.x + sideLength,
-        y: offset.y + (3 - row) * (pixelSize + spacing) - spacing,
-        z: offset.z + sideLength - (column * (pixelSize + spacing) + spacing),
+        y: offset.y + row * (pixelSize + spacing) - spacing,
+        z:
+          offset.z +
+          sideLength -
+          ((3 - column) * (pixelSize + spacing) + spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
