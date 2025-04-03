@@ -179,6 +179,18 @@ class Cube {
           });
         });
     }
+
+    if (0 !== this._rotationCount.z) {
+      Array(this._rotationCount.z)
+        .fill(0)
+        .map(() => {
+          this.rotateFaces({
+            x: 0,
+            y: 0,
+            z: -1,
+          });
+        });
+    }
   }
 
   // x: rotate up[1, 0] + down[1, 2]
