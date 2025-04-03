@@ -101,36 +101,38 @@ window.addEventListener("DOMContentLoaded", () => {
       y: 0,
       z: 0,
     };
+    let position = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
 
     switch (direction) {
       case "up":
-        move.y = 1;
+        move.x = 1;
+        position.y = positionIndex;
         break;
 
       case "left":
-        move.x = 1;
+        move.y = 1;
+        position.x = positionIndex;
         break;
 
       case "right":
-        move.x = -1;
+        move.y = -1;
+        position.x = positionIndex;
         break;
 
       case "down":
-        move.y = -1;
+        move.x = -1;
+        position.y = positionIndex;
         break;
 
       default:
         break;
     }
 
-    cube.rotateCube(
-      {
-        x: 2 - positionIndex, // 90, 180 reversed
-        y: positionIndex,
-        z: 0,
-      },
-      move
-    );
+    cube.rotateCube(position, move);
   });
 
   controls.$container.addEventListener("scramble", () => {
