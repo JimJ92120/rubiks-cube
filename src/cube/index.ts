@@ -83,12 +83,13 @@ class Cube {
     ],
     y: [
       // rows
+      [0, 1],
       [1, 1],
       [2, 1],
       [1, 3],
-      [0, 1],
     ],
     z: [
+      [0, 1],
       [1, 0],
       [2, 1],
       [1, 2],
@@ -268,17 +269,29 @@ class Cube {
 
   private updateFaceMap(rotationMove: RotationMove): void {
     Object.keys(rotationMove).map((rotationKey) => {
+      const translatedKey = ((): string => {
+        switch (rotationKey) {
+          case "x":
+            return "y";
+
+          case "y":
+            return "x";
+
+          default:
+            return rotationKey;
+        }
+      })() as keyof RotationMove;
       const rotationMoveValue = rotationMove[rotationKey as keyof RotationMove];
 
       if (rotationMoveValue) {
         const newFaceValues: Face[] = this.getNewFaceMapValues(
           rotationMoveValue,
-          this.movableFacesPositions[rotationKey].map(
+          this.movableFacesPositions[translatedKey].map(
             (position) => this.faceMap[position[1]][position[0]]
           )
         );
 
-        this.movableFacesPositions[rotationKey].map(
+        this.movableFacesPositions[translatedKey].map(
           (position, positionIndex) => {
             this.faceMap[position[1]][position[0]] =
               newFaceValues[positionIndex];
