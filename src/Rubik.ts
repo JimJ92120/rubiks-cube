@@ -41,10 +41,15 @@ export default function (
   ) => ObjectData)[] = [
     // up
     (index: number, row: number, column: number) => {
-      const start = {
-        z: sideLength - spacing - row * (pixelSize + spacing),
+      const offset = {
+        x: -pixelSize + spacing,
         y: -spacing,
-        x: column * (pixelSize + spacing) + spacing,
+        z: 0,
+      };
+      const start = {
+        x: offset.x + column * (pixelSize + spacing) - spacing,
+        y: offset.y,
+        z: offset.z + sideLength - (row * (pixelSize + spacing) - spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -62,7 +67,10 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: colors[0][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[0][index],
           },
         ],
         3
@@ -70,10 +78,15 @@ export default function (
     },
     // left
     (index: number, row: number, column: number) => {
+      const offset = {
+        x: -pixelSize - spacing,
+        y: spacing,
+        z: 0,
+      };
       const start = {
-        x: 0,
-        y: column * (pixelSize + spacing),
-        z: sideLength - spacing - row * (pixelSize + spacing),
+        x: offset.x,
+        y: offset.y + row * (pixelSize + spacing) - spacing,
+        z: offset.z + sideLength - (column * (pixelSize + spacing) - spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -91,7 +104,10 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[1][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[1][index],
           },
         ],
         3
@@ -100,9 +116,9 @@ export default function (
     // front
     (index: number, row: number, column: number) => {
       const start = {
+        x: column * (pixelSize + spacing),
+        y: row * (pixelSize + spacing),
         z: 0,
-        y: column * (pixelSize + spacing),
-        x: sideLength - spacing - row * (pixelSize + spacing) + spacing,
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -120,7 +136,10 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[2][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[2][index],
           },
         ],
         3
@@ -128,10 +147,15 @@ export default function (
     },
     // right
     (index: number, row: number, column: number) => {
+      const offset = {
+        x: -pixelSize - spacing,
+        y: -pixelSize,
+        z: 0,
+      };
       const start = {
-        x: sideLength + spacing,
-        y: column * (pixelSize + spacing),
-        z: sideLength - spacing - row * (pixelSize + spacing),
+        x: offset.x + sideLength,
+        y: offset.y + (3 - row) * (pixelSize + spacing) - spacing,
+        z: offset.z + sideLength - (column * (pixelSize + spacing) - spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -149,7 +173,10 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[3][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[3][index],
           },
         ],
         3
@@ -157,10 +184,16 @@ export default function (
     },
     // down
     (index: number, row: number, column: number) => {
+      const offset = {
+        x: -pixelSize + spacing,
+        y: 0,
+        z: pixelSize,
+      };
       const start = {
-        x: column * (pixelSize + spacing) + spacing,
-        y: sideLength - spacing,
-        z: sideLength - spacing - row * (pixelSize + spacing),
+        x: offset.x + column * (pixelSize + spacing) - spacing,
+        y: offset.y + sideLength,
+        z:
+          offset.z + sideLength - ((3 - row) * (pixelSize + spacing) - spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -178,7 +211,10 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: colors[4][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[4][index],
           },
         ],
         3
@@ -186,10 +222,15 @@ export default function (
     },
     // back
     (index: number, row: number, column: number) => {
+      const offset = {
+        x: spacing,
+        y: -pixelSize,
+        z: 0,
+      };
       const start = {
-        z: sideLength,
-        y: column * (pixelSize + spacing),
-        x: sideLength - spacing - row * (pixelSize + spacing) + spacing,
+        x: offset.x + column * (pixelSize + spacing) - spacing,
+        y: offset.y + (3 - row) * (pixelSize + spacing) - spacing,
+        z: offset.z + sideLength,
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -207,7 +248,10 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: colors[5][index],
+            color:
+              0 === row && (0 === column || 1 === column)
+                ? [0, 0, 0, 1]
+                : colors[5][index],
           },
         ],
         3
