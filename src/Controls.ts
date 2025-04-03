@@ -3,6 +3,8 @@ type RotationControls = {
   left: HTMLButtonElement;
   right: HTMLButtonElement;
   down: HTMLButtonElement;
+  upLeft: HTMLButtonElement;
+  upRight: HTMLButtonElement;
 };
 
 type MoveControls = {
@@ -82,6 +84,14 @@ class Controls {
 
           case this.$rotationControls.down:
             this.dispatchEvent("rotate", "down");
+            break;
+
+          case this.$rotationControls.upLeft:
+            this.dispatchEvent("rotate", "upLeft");
+            break;
+
+          case this.$rotationControls.upRight:
+            this.dispatchEvent("rotate", "upRight");
             break;
 
           default:

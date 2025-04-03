@@ -33,6 +33,8 @@ window.addEventListener("DOMContentLoaded", () => {
       left: $controls.querySelector(".rotation-controls__button--left")!,
       right: $controls.querySelector(".rotation-controls__button--right")!,
       down: $controls.querySelector(".rotation-controls__button--down")!,
+      upLeft: $controls.querySelector(".rotation-controls__button--up-left")!,
+      upRight: $controls.querySelector(".rotation-controls__button--up-right")!,
     },
     {
       direction: $controls.querySelector(".move-controls__direction")!,
@@ -84,6 +86,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
       case "down":
         cube.rotateFaces({ x: 0, y: -1, z: 0 });
+        break;
+
+      case "upLeft":
+        cube.rotateFaces({ x: 0, y: 0, z: 1 });
+        break;
+
+      case "upRight":
+        cube.rotateFaces({ x: 0, y: 0, z: -1 });
         break;
 
       default:

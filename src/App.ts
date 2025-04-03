@@ -12,20 +12,26 @@ class App {
   
   <canvas id="scene"></canvas>
 
-
-
-  <div id="controls">
-    <p>FaceMap</p>
+  <p>
+    FaceMap
     <pre id="test"></pre>
-
+  </p>
+  
+  <div id="controls">
     <button class="scramble-controls">Scramble</button>
 
     <p>Rotate:</p>
     <div class="rotation-controls">
-      <button class="rotation-controls__button rotation-controls__button--up">\V</button>
-      <button class="rotation-controls__button rotation-controls__button--left">\<</button>
-      <button class="rotation-controls__button rotation-controls__button--right">\></button>
-      <button class="rotation-controls__button rotation-controls__button--down">\V</button>
+      <div>
+        <button class="rotation-controls__button rotation-controls__button--up-left">\&#9700;</button>
+        <button class="rotation-controls__button rotation-controls__button--up">\&#9650;</button>
+        <button class="rotation-controls__button rotation-controls__button--up-right">\&#9701;</button>
+      </div>
+      <div>
+        <button class="rotation-controls__button rotation-controls__button--left">\&#9664;</button>
+        <button class="rotation-controls__button rotation-controls__button--down">\&#9660;</button>
+        <button class="rotation-controls__button rotation-controls__button--right">\&#9654;</button>
+      </div>
     </div>
 
     <p>Move:</p>
@@ -54,15 +60,14 @@ class App {
   <style>
     #controls {
       margin-top: 2rem;
+      font-size: 1.75rem;
     }
     .rotation-controls,
     .move-controls {
-      font-size: 1.25rem;
       display: flex;
-      flex-flow: row wrap;
+      flex-flow: column wrap;
       align-content: center;
       justify-content: center;
-      max-width: 6rem;
       margin-left: auto;
       margin-right: auto;
       margin-top: 1rem;
@@ -71,29 +76,11 @@ class App {
     .rotation-controls {
       margin-bottom: 2rem;
     }
-    .rotation-controls > * {
-      flex: 1 100%;
-    }
+ 
     .rotation-controls__button {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
     }
-    .rotation-controls__button--up {
-      margin-left: calc(100% / 3);
-      margin-right: calc(100% / 3);
-      transform: rotate(180deg);
-    }
-    .rotation-controls__button--left {
-      flex: 1 auto;
-      order: 1;
-    }
-    .rotation-controls__button--right {
-      flex: 1 auto;
-      order: 3;
-    }
-    .rotation-controls__button--down {
-      flex: 3 0px;
-      order: 2;
-    }
+
     
     .move-controls > * {
       margin-bottom: 1rem;
