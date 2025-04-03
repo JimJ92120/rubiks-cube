@@ -13,7 +13,7 @@ const CAMERA_OPTIONS = {
   aspect: SCENE_OPTIONS.width / SCENE_OPTIONS.height,
   zNear: 1,
   zFar: 2000,
-  fieldOfView: degToRad(90),
+  fieldOfView: degToRad(70),
   angle: degToRad(-22.5),
 };
 const COLORS: { [key: string]: ColorRGBA } = {
