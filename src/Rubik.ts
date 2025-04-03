@@ -211,7 +211,7 @@ export default function (
     // back
     (index: number, row: number, column: number) => {
       const offset = {
-        x: 0,
+        x: spacing,
         y: -pixelSize,
         z: 0,
       };
