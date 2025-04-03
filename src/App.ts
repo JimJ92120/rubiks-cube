@@ -8,11 +8,16 @@ class App {
 
   render() {
     this.$container.innerHTML = `
-  <h1>Rubik's Cussbe</h1>
+  <h1>Rubik's Cube</h1>
   
   <canvas id="scene"></canvas>
 
+
+
   <div id="controls">
+    <p>FaceMap</p>
+    <pre id="test"></pre>
+
     <button class="scramble-controls">Scramble</button>
 
     <p>Rotate:</p>

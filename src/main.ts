@@ -17,6 +17,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const app = new App("app-container");
   app.render();
 
+  const $testContainer: HTMLPreElement = app.$container.querySelector("#test")!;
   const $scene: HTMLCanvasElement = app.$container.querySelector("#scene")!;
   const $controls: HTMLElement = app.$container.querySelector("#controls")!;
 
@@ -107,9 +108,11 @@ window.addEventListener("DOMContentLoaded", () => {
       z: 0,
     };
 
+    // ! move.x to move columns
+    // ! move.y to move rows
     switch (direction) {
       case "up":
-        move.x = 1;
+        move.x = -1;
         position.y = positionIndex;
         break;
 
@@ -124,7 +127,7 @@ window.addEventListener("DOMContentLoaded", () => {
         break;
 
       case "down":
-        move.x = -1;
+        move.x = 1;
         position.y = positionIndex;
         break;
 
@@ -171,6 +174,12 @@ window.addEventListener("DOMContentLoaded", () => {
       //   },
       //   3
       // );
+
+      $testContainer.innerText = cube.faceMap.reduce(
+        (_result, row) =>
+          _result + row.map((value) => Number(value) || " ").join(" ") + "\n",
+        ""
+      );
 
       Shapes.render(
         engine,

@@ -75,16 +75,18 @@ class Cube {
   ];
   movableFacesPositions: { [key: string]: [number, number][] } = {
     x: [
-      [1, 1],
-      [2, 1],
-      [1, 3],
-      [0, 1],
-    ],
-    y: [
+      // columns
       [1, 0],
       [1, 1],
       [1, 2],
       [1, 3],
+    ],
+    y: [
+      // rows
+      [1, 1],
+      [2, 1],
+      [1, 3],
+      [0, 1],
     ],
     z: [
       [1, 0],

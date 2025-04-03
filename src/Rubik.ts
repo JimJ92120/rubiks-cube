@@ -49,7 +49,7 @@ export default function (
       const start = {
         x: offset.x + column * (pixelSize + spacing) - spacing,
         y: offset.y,
-        z: offset.z + sideLength - (row * (pixelSize + spacing) - spacing),
+        z: offset.z + sideLength - (row * (pixelSize + spacing) + spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -67,10 +67,7 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[0][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[0][index],
           },
         ],
         3
@@ -86,7 +83,7 @@ export default function (
       const start = {
         x: offset.x,
         y: offset.y + row * (pixelSize + spacing) - spacing,
-        z: offset.z + sideLength - (column * (pixelSize + spacing) - spacing),
+        z: offset.z + sideLength - (column * (pixelSize + spacing) + spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -104,10 +101,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[1][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[1][index],
           },
         ],
         3
@@ -136,10 +130,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[2][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[2][index],
           },
         ],
         3
@@ -155,7 +146,7 @@ export default function (
       const start = {
         x: offset.x + sideLength,
         y: offset.y + (3 - row) * (pixelSize + spacing) - spacing,
-        z: offset.z + sideLength - (column * (pixelSize + spacing) - spacing),
+        z: offset.z + sideLength - (column * (pixelSize + spacing) + spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -173,10 +164,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[3][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[3][index],
           },
         ],
         3
@@ -187,13 +175,13 @@ export default function (
       const offset = {
         x: -pixelSize + spacing,
         y: 0,
-        z: pixelSize,
+        z: pixelSize + spacing,
       };
       const start = {
         x: offset.x + column * (pixelSize + spacing) - spacing,
-        y: offset.y + sideLength,
+        y: offset.y + sideLength - spacing,
         z:
-          offset.z + sideLength - ((3 - row) * (pixelSize + spacing) - spacing),
+          offset.z + sideLength - ((3 - row) * (pixelSize + spacing) + spacing),
       };
 
       return Shapes["2d"].Quadrilateral(
@@ -211,10 +199,7 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[4][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[4][index],
           },
         ],
         3
@@ -223,7 +208,7 @@ export default function (
     // back
     (index: number, row: number, column: number) => {
       const offset = {
-        x: spacing,
+        x: 0,
         y: -pixelSize,
         z: 0,
       };
@@ -248,10 +233,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color:
-              0 === row && (0 === column || 1 === column)
-                ? [0, 0, 0, 1]
-                : colors[5][index],
+            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[5][index],
           },
         ],
         3
