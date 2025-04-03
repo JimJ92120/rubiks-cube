@@ -188,6 +188,8 @@ class Cube {
     this.updateCubeData(rotationMove);
   }
 
+  // ! missing rotate cube up > rotate row left | right
+  // to translate rows to columns based on current cube.rotation
   rotateCube(origin: CellPosition, rotationMove: RotationMove): void {
     Object.keys(rotationMove).map((rotationKey) => {
       const rotationMoveValue = rotationMove[rotationKey as keyof RotationMove];
@@ -220,9 +222,21 @@ class Cube {
         callback = (position: [number, number], faceIndex: number) =>
           allValues[position[0] + faceIndex * 3];
       } else if (rotationMove.y) {
-        positions = movableFaceValues.map((faceValue) =>
-          this.cubeData[faceValue - 1].map((_, index) => [origin.x, index])
-        );
+        const backFaceValue = this.faceMap[3][1];
+
+        positions = movableFaceValues.map((faceValue) => {
+          if (backFaceValue === faceValue) {
+            return this.cubeData[faceValue - 1].map((_, index) => [
+              2 - origin.x,
+              index,
+            ]);
+          }
+
+          return this.cubeData[faceValue - 1].map((_, index) => [
+            origin.x,
+            index,
+          ]);
+        });
         allValues = this.getNewCubeValues(
           movableFaceValues,
           positions,
