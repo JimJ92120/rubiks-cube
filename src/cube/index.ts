@@ -93,7 +93,6 @@ class Cube {
       [1, 0],
       [2, 1],
       [1, 2],
-      [0, 1],
     ],
   };
 
@@ -308,6 +307,8 @@ class Cube {
             (position) => this.faceMap[position[1]][position[0]]
           )
         );
+
+        console.log(rotationKey, this.movableFacesPositions[translatedKey]);
 
         this.movableFacesPositions[translatedKey].map(
           (position, positionIndex) => {
