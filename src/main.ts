@@ -65,10 +65,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const matrix = Matrix4.multiply(projectionMatrix, viewMatrix);
 
   //
-  const interval = 100;
-  const startTime = Date.now();
   let loop = 0;
-  let timestamp = startTime;
 
   controls.$container.addEventListener("rotate", (event: any) => {
     switch (event.detail || "") {
@@ -141,15 +138,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   const animate: FrameRequestCallback = () => {
-    const currentTime = Date.now();
-
-    if (
-      loop > 0 &&
-      currentTime > timestamp + interval &&
-      currentTime < timestamp + interval * 2
-    ) {
-      timestamp = currentTime;
-
+    if (loop > 0) {
       engine.clearCanvas();
 
       // avoid to re-compute at each iteration
