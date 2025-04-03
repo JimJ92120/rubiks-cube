@@ -139,7 +139,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   controls.$container.addEventListener("scramble", () => {
-    cube.scramble(20);
+    cube.scramble(100);
   });
 
   const animate: FrameRequestCallback = () => {
@@ -163,17 +163,6 @@ window.addEventListener("DOMContentLoaded", () => {
           }, [] as ColorRGBA[]);
         }) as RubikColors
       );
-      // const background = Shapes["3d"].Cube(
-      //   {
-      //     position: [0, 0, 0],
-      //     size: SCENE_OPTIONS.pixelSize * 3 + SCENE_OPTIONS.spacing * 2,
-      //     rotation: cube.rotation,
-      //     colors: Array(6)
-      //       .fill(0)
-      //       .map(() => [0, 0, 0, 1]) as CubeData["colors"],
-      //   },
-      //   3
-      // );
 
       $testContainer.innerText = cube.faceMap.reduce(
         (_result, row) =>
@@ -184,7 +173,7 @@ window.addEventListener("DOMContentLoaded", () => {
       Shapes.render(
         engine,
         [
-          // ...background,
+          //
           ...rubik,
         ],
         Shaders.vertexShader,
