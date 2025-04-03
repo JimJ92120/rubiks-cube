@@ -308,8 +308,6 @@ class Cube {
           )
         );
 
-        console.log(rotationKey, this.movableFacesPositions[translatedKey]);
-
         this.movableFacesPositions[translatedKey].map(
           (position, positionIndex) => {
             this.faceMap[position[1]][position[0]] =
