@@ -33,8 +33,8 @@ window.addEventListener("DOMContentLoaded", () => {
       left: $controls.querySelector(".rotation-controls__button--left")!,
       right: $controls.querySelector(".rotation-controls__button--right")!,
       down: $controls.querySelector(".rotation-controls__button--down")!,
-      upLeft: $controls.querySelector(".rotation-controls__button--up-left")!,
-      upRight: $controls.querySelector(".rotation-controls__button--up-right")!,
+      // upLeft: $controls.querySelector(".rotation-controls__button--up-left")!,
+      // upRight: $controls.querySelector(".rotation-controls__button--up-right")!,
     },
     {
       direction: $controls.querySelector(".move-controls__direction")!,
@@ -51,6 +51,18 @@ window.addEventListener("DOMContentLoaded", () => {
   );
   let cube = new Cube();
 
+  // test
+  cube.cubeData.map((face, faceIndex) => {
+    face.map((row, rowIndex) => {
+      row.map((_, columnIndex) => {
+        if (0 === rowIndex && 0 === columnIndex) {
+          cube.cubeData[faceIndex][rowIndex][columnIndex] = 1;
+        }
+      });
+    });
+  });
+  //
+
   const projectionMatrix: number[] = Matrix4.perspective(
     CAMERA_OPTIONS.fieldOfView,
     CAMERA_OPTIONS.aspect,
@@ -66,9 +78,6 @@ window.addEventListener("DOMContentLoaded", () => {
     )
   );
   const matrix = Matrix4.multiply(projectionMatrix, viewMatrix);
-
-  //
-  let loop = 0;
 
   controls.$container.addEventListener("rotate", (event: any) => {
     switch (event.detail || "") {
@@ -88,13 +97,14 @@ window.addEventListener("DOMContentLoaded", () => {
         cube.rotateFaces({ x: 0, y: -1, z: 0 });
         break;
 
-      case "upLeft":
-        cube.rotateFaces({ x: 0, y: 0, z: 1 });
-        break;
+      // case "upLeft":
+      //   cube.rotateFaces({ x: 0, y: 0, z: 1 });
+      //   console.log(cube.cubeData);
+      //   break;
 
-      case "upRight":
-        cube.rotateFaces({ x: 0, y: 0, z: -1 });
-        break;
+      // case "upRight":
+      //   cube.rotateFaces({ x: 0, y: 0, z: -1 });
+      //   break;
 
       default:
         break;
@@ -152,6 +162,8 @@ window.addEventListener("DOMContentLoaded", () => {
     cube.scramble(100);
   });
 
+  //
+  let loop = 0;
   const animate: FrameRequestCallback = () => {
     if (loop > 0) {
       engine.clearCanvas();
@@ -174,11 +186,42 @@ window.addEventListener("DOMContentLoaded", () => {
         }) as RubikColors
       );
 
-      $testContainer.innerText = cube.faceMap.reduce(
-        (_result, row) =>
-          _result + row.map((value) => Number(value) || " ").join(" ") + "\n",
-        ""
-      );
+      $testContainer.innerText = cube.faceMap.reduce((_result, row) => {
+        let convert = (value: number): string => {
+          switch (value) {
+            case 1:
+              return "W";
+
+            case 2:
+              return "G";
+
+            case 3:
+              return "R";
+
+            case 4:
+              return "O";
+
+            case 5:
+              return "Y";
+
+            case 6:
+              return "B";
+
+            default:
+              return "";
+          }
+        };
+
+        return (
+          _result +
+          row
+            .map((value) =>
+              value ? `${value}.${convert(Number(value))}` : "  "
+            )
+            .join(" | ") +
+          "\n"
+        );
+      }, "");
 
       Shapes.render(
         engine,
