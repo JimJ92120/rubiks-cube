@@ -1,4 +1,4 @@
-import Matrix3 from "../maths/Matrix3";
+import { Matrix3 } from "./maths";
 
 enum CubeFaceColor {
   None,

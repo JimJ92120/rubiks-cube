@@ -5,13 +5,13 @@ import Engine from "./engine";
 import Shaders from "./engine/Shaders";
 import Shapes from "./engine/Shapes";
 
-import { App } from "./App";
+import App from "./app";
 
 import Rubik, { RubikColors } from "./Rubik";
-import Cube, { Coordinate, CubeFace } from "./cube";
+import Cube, { Coordinate, CubeFace } from "./Cube";
 
 import { SCENE_OPTIONS, CAMERA_OPTIONS, COLORS } from "./options";
-import Controls, { MoveControls } from "./Controls";
+import Controls, { MoveControls } from "./app/Controls";
 
 window.addEventListener("DOMContentLoaded", () => {
   const app = new App("app-container");
