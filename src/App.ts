@@ -20,7 +20,6 @@ class App {
   <div id="controls">
     <button class="scramble-controls">Scramble</button>
 
-    <p>Rotate:</p>
     <div class="rotation-controls">
       <div>
         <button class="rotation-controls__button rotation-controls__button--up-left">\&#9700;</button>
