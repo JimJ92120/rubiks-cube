@@ -77,11 +77,11 @@ window.addEventListener("DOMContentLoaded", () => {
         break;
 
       case "left":
-        cube.rotateFaces({ x: -1, y: 0, z: 0 });
+        cube.rotateFaces({ x: 1, y: 0, z: 0 });
         break;
 
       case "right":
-        cube.rotateFaces({ x: 1, y: 0, z: 0 });
+        cube.rotateFaces({ x: -1, y: 0, z: 0 });
         break;
 
       case "down":
