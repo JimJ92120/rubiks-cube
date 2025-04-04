@@ -8,7 +8,7 @@ import Shapes from "./engine/Shapes";
 import { App } from "./App";
 
 import Rubik, { RubikColors } from "./Rubik";
-import Cube, { RotationMove } from "./cube";
+import Cube, { Coordinate, CubeFace } from "./cube";
 
 import { SCENE_OPTIONS, CAMERA_OPTIONS, COLORS } from "./options";
 import Controls, { MoveControls } from "./Controls";
@@ -33,8 +33,8 @@ window.addEventListener("DOMContentLoaded", () => {
       left: $controls.querySelector(".rotation-controls__button--left")!,
       right: $controls.querySelector(".rotation-controls__button--right")!,
       down: $controls.querySelector(".rotation-controls__button--down")!,
-      // upLeft: $controls.querySelector(".rotation-controls__button--up-left")!,
-      // upRight: $controls.querySelector(".rotation-controls__button--up-right")!,
+      upLeft: $controls.querySelector(".rotation-controls__button--up-left")!,
+      upRight: $controls.querySelector(".rotation-controls__button--up-right")!,
     },
     {
       direction: $controls.querySelector(".move-controls__direction")!,
@@ -49,19 +49,6 @@ window.addEventListener("DOMContentLoaded", () => {
     },
     $controls.querySelector(".scramble-controls")!
   );
-  let cube = new Cube();
-
-  // test
-  cube.cubeData.map((face, faceIndex) => {
-    face.map((row, rowIndex) => {
-      row.map((_, columnIndex) => {
-        if (0 === rowIndex && 0 === columnIndex) {
-          cube.cubeData[faceIndex][rowIndex][columnIndex] = 1;
-        }
-      });
-    });
-  });
-  //
 
   const projectionMatrix: number[] = Matrix4.perspective(
     CAMERA_OPTIONS.fieldOfView,
@@ -79,32 +66,46 @@ window.addEventListener("DOMContentLoaded", () => {
   );
   const matrix = Matrix4.multiply(projectionMatrix, viewMatrix);
 
+  //
+  let cube = new Cube();
+
+  // test
+  cube.data.map((face, faceIndex) => {
+    face.map((row, rowIndex) => {
+      row.map((_, columnIndex) => {
+        if (0 === rowIndex && 0 === columnIndex) {
+          cube.data[faceIndex][rowIndex][columnIndex] = 1;
+        }
+      });
+    });
+  });
+  //
+
   controls.$container.addEventListener("rotate", (event: any) => {
     switch (event.detail || "") {
       case "up":
-        cube.rotateFaces({ x: 0, y: 1, z: 0 });
+        cube.rotate({ y: 1 });
         break;
 
       case "left":
-        cube.rotateFaces({ x: 1, y: 0, z: 0 });
+        cube.rotate({ x: 1 });
         break;
 
       case "right":
-        cube.rotateFaces({ x: -1, y: 0, z: 0 });
+        cube.rotate({ x: -1 });
         break;
 
       case "down":
-        cube.rotateFaces({ x: 0, y: -1, z: 0 });
+        cube.rotate({ y: -1 });
         break;
 
-      // case "upLeft":
-      //   cube.rotateFaces({ x: 0, y: 0, z: 1 });
-      //   console.log(cube.cubeData);
-      //   break;
+      case "upLeft":
+        cube.rotate({ z: 1 });
+        break;
 
-      // case "upRight":
-      //   cube.rotateFaces({ x: 0, y: 0, z: -1 });
-      //   break;
+      case "upRight":
+        cube.rotate({ z: -1 });
+        break;
 
       default:
         break;
@@ -117,45 +118,32 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const { direction, positionIndex } = event.detail;
-    let move: RotationMove = {
-      x: 0,
-      y: 0,
-      z: 0,
-    };
-    let position = {
-      x: 0,
-      y: 0,
-      z: 0,
-    };
+    let move: Coordinate<1 | -1> = {};
 
     // ! move.x to move columns
     // ! move.y to move rows
     switch (direction) {
       case "up":
-        move.x = -1;
-        position.y = positionIndex;
+        move.y = 1;
         break;
 
       case "left":
-        move.y = 1;
-        position.x = positionIndex;
+        move.x = 1;
         break;
 
       case "right":
-        move.y = -1;
-        position.x = positionIndex;
+        move.x = -1;
         break;
 
       case "down":
-        move.x = 1;
-        position.y = positionIndex;
+        move.y = -1;
         break;
 
       default:
         break;
     }
 
-    cube.rotateCube(position, move);
+    cube.move(move, positionIndex);
   });
 
   controls.$container.addEventListener("scramble", () => {
@@ -174,7 +162,7 @@ window.addEventListener("DOMContentLoaded", () => {
         SCENE_OPTIONS.spacing,
         cube.position,
         cube.rotation,
-        cube.cubeData.map((face) => {
+        cube.data.map((face) => {
           return face.reduce((_result, row) => {
             return [
               ..._result,
@@ -186,42 +174,15 @@ window.addEventListener("DOMContentLoaded", () => {
         }) as RubikColors
       );
 
-      $testContainer.innerText = cube.faceMap.reduce((_result, row) => {
-        let convert = (value: number): string => {
-          switch (value) {
-            case 1:
-              return "W";
-
-            case 2:
-              return "G";
-
-            case 3:
-              return "R";
-
-            case 4:
-              return "O";
-
-            case 5:
-              return "Y";
-
-            case 6:
-              return "B";
-
-            default:
-              return "";
-          }
-        };
-
-        return (
+      $testContainer.innerText = cube.faceMap2D.reduce(
+        (_result, row) =>
           _result +
           row
-            .map((value) =>
-              value ? `${value}.${convert(Number(value))}` : "  "
-            )
-            .join(" | ") +
-          "\n"
-        );
-      }, "");
+            .map((value) => (typeof CubeFace.Up === typeof value ? value : " "))
+            .join(" ") +
+          "\n",
+        ""
+      );
 
       Shapes.render(
         engine,

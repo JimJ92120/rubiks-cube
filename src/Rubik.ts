@@ -67,7 +67,7 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[0][index],
+            color: colors[0][index],
           },
         ],
         3
@@ -101,7 +101,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[1][index],
+            color: colors[1][index],
           },
         ],
         3
@@ -130,7 +130,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[2][index],
+            color: colors[2][index],
           },
         ],
         3
@@ -167,7 +167,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[3][index],
+            color: colors[3][index],
           },
         ],
         3
@@ -202,7 +202,7 @@ export default function (
               [start.x + pixelSize, start.y, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[4][index],
+            color: colors[4][index],
           },
         ],
         3
@@ -236,7 +236,7 @@ export default function (
               [start.x, start.y + pixelSize, start.z],
             ],
             rotation,
-            color: 0 === row && 0 === column ? [0, 0, 0, 1] : colors[5][index],
+            color: colors[5][index],
           },
         ],
         3

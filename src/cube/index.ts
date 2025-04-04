@@ -1,13 +1,6 @@
-enum Face {
-  None,
-  Up,
-  Left,
-  Front,
-  Right,
-  Down,
-  Back,
-}
-enum FaceColor {
+import Matrix3 from "../maths/Matrix3";
+
+enum CubeFaceColor {
   None,
   White, // up
   Orange, // left
@@ -17,367 +10,326 @@ enum FaceColor {
   Blue, // back
 }
 
-type CellPosition = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type FaceData = [
-  [FaceColor, FaceColor, FaceColor],
-  [FaceColor, FaceColor, FaceColor],
-  [FaceColor, FaceColor, FaceColor]
-];
-// each face is presented as facing it.
-// indices as followed:
-//   1
-// 2 3 4
-//   5
-//   6
-type CubeData = [FaceData, FaceData, FaceData, FaceData, FaceData, FaceData];
-
-type FaceMap = [
-  [Face, Face, Face],
-  [Face, Face, Face],
-  [Face, Face, Face],
-  [Face, Face, Face]
+type CubeRowData = [CubeFaceColor, CubeFaceColor, CubeFaceColor];
+type CubeFaceData = [CubeRowData, CubeRowData, CubeRowData];
+type CubeData = [
+  CubeFaceData,
+  CubeFaceData,
+  CubeFaceData,
+  //
+  CubeFaceData,
+  CubeFaceData,
+  CubeFaceData
 ];
 
-type Rotation = {
-  x: number; // left - right
-  y: number; // up - down
-  z: number; // clockwise - anti-clockwise
+enum CubeFace {
+  Up,
+  Left,
+  Front,
+  Right,
+  Down,
+  Back,
+}
+type CubeMap = {
+  up: CubeFace;
+  down: CubeFace;
+  front: CubeFace;
+  back: CubeFace;
+  left: CubeFace;
+  right: CubeFace;
 };
-type Position = [number, number, number];
 
-type RotationMoveValue = -1 | 0 | 1;
-type RotationMove = {
-  x: RotationMoveValue;
-  y: RotationMoveValue;
-  z: RotationMoveValue;
+type MovableFacesValue = [CubeFace, CubeFace, CubeFace, CubeFace];
+type MovableFaces = {
+  x: MovableFacesValue;
+  y: MovableFacesValue;
+  z: MovableFacesValue;
+};
+type AdjacentFacesValue = [CubeFace, CubeFace];
+type AdjacentFaces = {
+  x: AdjacentFacesValue;
+  y: AdjacentFacesValue;
+  z: AdjacentFacesValue;
 };
 
+type Coordinate<CoordinateType> = {
+  x?: CoordinateType;
+  y?: CoordinateType;
+  z?: CoordinateType;
+};
+
+// x: rotate columns up or down | down: 1, up: -1
+// y: rotate rows left or right | left: 1, right: -1
+// z: rotate cube left or right | -
 class Cube {
-  private _rotationCount: Rotation = {
-    x: 0,
-    y: 0,
-    z: 0,
+  position: [number, number, number] = [0, 0, 0];
+  rotation = { x: 0, y: 0, z: 0 };
+  data: CubeData;
+  faceMap: CubeMap = {
+    up: CubeFace.Up,
+    down: CubeFace.Down,
+    front: CubeFace.Front,
+    back: CubeFace.Back,
+    left: CubeFace.Left,
+    right: CubeFace.Right,
   };
-  position: Position = [0, 0, 0];
-
-  faceCount: number = 6;
-  faceSize: [number, number] = [3, 3];
-  faceMap: FaceMap = [
-    [Face.None, Face.Up, Face.None],
-    [Face.Left, Face.Front, Face.Right],
-    [Face.None, Face.Down, Face.None],
-    [Face.None, Face.Back, Face.None],
-  ];
-  movableFacesPositions: { [key: string]: [number, number][] } = {
-    x: [
-      // columns
-      [1, 0],
-      [1, 1],
-      [1, 2],
-      [1, 3],
-    ],
-    y: [
-      // rows
-      [0, 1],
-      [1, 1],
-      [2, 1],
-      [1, 3],
-    ],
-    z: [
-      [0, 1],
-      [1, 0],
-      [2, 1],
-      [1, 2],
-    ],
+  private movableFaces: MovableFaces = {
+    x: [CubeFace.Left, CubeFace.Front, CubeFace.Right, CubeFace.Back],
+    y: [CubeFace.Up, CubeFace.Front, CubeFace.Down, CubeFace.Back],
+    z: [CubeFace.Up, CubeFace.Right, CubeFace.Down, CubeFace.Left],
   };
-
-  cubeData: CubeData;
+  private adjacentFaces: AdjacentFaces = {
+    x: [CubeFace.Up, CubeFace.Down],
+    y: [CubeFace.Right, CubeFace.Left],
+    z: [CubeFace.Back, CubeFace.Front],
+  };
 
   constructor() {
-    this.cubeData = Array(this.faceCount)
+    //
+
+    this.data = Array(6)
       .fill(null)
       .map((_, faceIndex) =>
-        Array(this.faceSize[1])
+        Array(3)
           .fill(0)
-          .map(() =>
-            Array(this.faceSize[0]).fill(Object.keys(FaceColor)[faceIndex + 1])
-          )
+          .map(() => Array(3).fill(Object.keys(CubeFaceColor)[faceIndex + 1]))
       ) as CubeData;
   }
 
-  get rotation(): Rotation {
-    const { x, y, z } = this._rotationCount;
-
-    return {
-      x: x * 90,
-      y: y * 90,
-      z: z * 90,
-    };
+  get faceMap2D(): [CubeFace | null, CubeFace | null, CubeFace | null][] {
+    return [
+      [null, this.faceMap.up, null],
+      [this.faceMap.left, this.faceMap.front, this.faceMap.right],
+      [null, this.faceMap.down, null],
+      [null, this.faceMap.back, null],
+    ];
   }
 
   scramble(moveCount: number): void {
     const random2Axis = () =>
-      ["x", "y"][Math.floor(Math.random() * 2)] as keyof RotationMove;
-    const random3 = () => Math.floor(Math.random() * 3);
+      ["x", "y"][Math.floor(Math.random() * 2)] as keyof Coordinate<any>;
+    const random3 = () => Math.floor(Math.random() * 3) as 0 | 1 | 2;
     const randomPositiveNegative = () =>
       Math.floor(Math.random() * 1) ? -1 : 1;
 
     Array(moveCount)
       .fill(0)
       .map((_, index) => {
-        if (!(index % 3)) {
-          this.rotateFaces({
-            ...{ x: 0, y: 0, z: 0 },
-            ...{ [random2Axis()]: randomPositiveNegative() },
-          });
-        }
-
-        this.rotateCube(
+        this.move(
           {
-            x: random3(),
-            y: random3(),
-            z: 0,
+            [random2Axis()]: randomPositiveNegative,
           },
-          {
-            ...{
-              x: 0,
-              y: 0,
-              z: 0,
-            },
-            ...{
-              [random2Axis()]: randomPositiveNegative,
-            },
-          }
+          random3()
         );
       });
-
-    if (0 !== this._rotationCount.x) {
-      Array(this._rotationCount.x)
-        .fill(0)
-        .map(() => {
-          this.rotateFaces({
-            x: -1,
-            y: 0,
-            z: 0,
-          });
-        });
-    }
-
-    if (0 !== this._rotationCount.y) {
-      Array(this._rotationCount.y)
-        .fill(0)
-        .map(() => {
-          this.rotateFaces({
-            x: 0,
-            y: -1,
-            z: 0,
-          });
-        });
-    }
-
-    if (0 !== this._rotationCount.z) {
-      Array(this._rotationCount.z)
-        .fill(0)
-        .map(() => {
-          this.rotateFaces({
-            x: 0,
-            y: 0,
-            z: -1,
-          });
-        });
-    }
   }
 
-  // x: rotate up[1, 0] + down[1, 2]
-  // y: rotate left[0, 1] + right[2, 1]
-  // z: rotate front[1, 1] + back[1, 3]
-  rotateFaces(rotationMove: RotationMove): void {
-    this.updateFaceMap(rotationMove);
-    this.updateRotation(rotationMove);
-  }
-
-  // ! missing rotate cube up > rotate row left | right
-  // to translate rows to columns based on current cube.rotation
-  // or rotate cube.cubeData values in cube.updateCubeData()
-  rotateCube(origin: CellPosition, rotationMove: RotationMove): void {
-    Object.keys(rotationMove).map((rotationKey) => {
-      const rotationMoveValue = rotationMove[rotationKey as keyof RotationMove];
-
-      if (!rotationMoveValue) {
-        return;
+  // rotate the whole cube along x, y, z
+  // x: left - right
+  // y: up - down
+  // z: zLeft - zRight
+  rotate(rotation: Coordinate<1 | -1>): void {
+    const rotationKey: keyof Coordinate<any> | null = (() => {
+      if (rotation.x) {
+        return "x";
+      } else if (rotation.y) {
+        return "y";
+      } else if (rotation.z) {
+        return "z";
       }
 
-      const movableFaceValues: Face[] = this.movableFacesPositions[
-        rotationKey
-      ].map((position) => this.faceMap[position[1]][position[0]]);
+      return null;
+    })();
 
-      let positions: [number, number][][] = [];
-      let allValues: FaceColor[] = [];
-      let callback: (
-        position: [number, number],
-        faceIndex: number
-      ) => FaceColor;
-
-      if (rotationMove.x) {
-        positions = movableFaceValues.map((faceValue) =>
-          this.cubeData[faceValue - 1].map((_, index) => [index, origin.y])
-        );
-        allValues = this.getNewCubeValues(
-          movableFaceValues,
-          positions,
-          0 > rotationMove.x
-        );
-
-        callback = (position: [number, number], faceIndex: number) =>
-          allValues[position[0] + faceIndex * 3];
-      } else if (rotationMove.y) {
-        const backFaceValue = this.faceMap[3][1];
-
-        positions = movableFaceValues.map((faceValue) => {
-          if (backFaceValue === faceValue) {
-            return this.cubeData[faceValue - 1].map((_, index) => [
-              2 - origin.x,
-              index,
-            ]);
-          }
-
-          return this.cubeData[faceValue - 1].map((_, index) => [
-            origin.x,
-            index,
-          ]);
-        });
-        allValues = this.getNewCubeValues(
-          movableFaceValues,
-          positions,
-          0 < rotationMove.y
-        );
-
-        callback = (position: [number, number], faceIndex: number) =>
-          allValues[position[1] + faceIndex * 3];
-      } else if (rotationMove.z) {
-        // if z => getLayers
-      }
-
-      movableFaceValues.map((faceValue, faceIndex) => {
-        positions[faceIndex].map(
-          (position) =>
-            (this.cubeData[faceValue - 1][position[1]][position[0]] = callback(
-              position,
-              faceIndex
-            ))
-        );
-      });
-    });
-  }
-
-  private updateRotation(rotationMove: RotationMove): void {
-    const { x, y, z } = this._rotationCount;
-
-    this._rotationCount = {
-      x: x + (rotationMove.x || 0),
-      y: y + (rotationMove.y || 0),
-      z: z + (rotationMove.z || 0),
-    };
-
-    Object.keys(this._rotationCount).map((rotationKey) => {
-      const rotationValue = this._rotationCount[rotationKey as keyof Rotation];
-
-      if (0 > rotationValue) {
-        this._rotationCount[rotationKey as keyof Rotation] = 3;
-      } else if (3 < rotationValue) {
-        this._rotationCount[rotationKey as keyof Rotation] = 0;
-      }
-    });
-  }
-
-  private updateFaceMap(rotationMove: RotationMove): void {
-    Object.keys(rotationMove).map((rotationKey) => {
-      const translatedKey = ((): string => {
-        switch (rotationKey) {
-          case "x":
-            return "y";
-
-          case "y":
-            return "x";
-
-          default:
-            return rotationKey;
-        }
-      })() as keyof RotationMove;
-      const rotationMoveValue = rotationMove[rotationKey as keyof RotationMove];
-
-      if (rotationMoveValue) {
-        const newFaceValues: Face[] = this.getNewFaceMapValues(
-          rotationMoveValue,
-          this.movableFacesPositions[translatedKey].map(
-            (position) => this.faceMap[position[1]][position[0]]
-          )
-        );
-
-        this.movableFacesPositions[translatedKey].map(
-          (position, positionIndex) => {
-            this.faceMap[position[1]][position[0]] =
-              newFaceValues[positionIndex];
-          }
-        );
-      }
-    });
-  }
-
-  private getNewFaceMapValues(
-    rotationMoveValue: RotationMoveValue,
-    currentFaceValues: Face[]
-  ): Face[] {
-    if (0 < rotationMoveValue) {
-      currentFaceValues.unshift(
-        currentFaceValues[currentFaceValues.length - 1]
-      );
-      currentFaceValues.pop();
-    } else if (0 > rotationMoveValue) {
-      currentFaceValues.push(currentFaceValues[0]);
-      currentFaceValues.shift();
+    if (!rotationKey || !rotation[rotationKey]) {
+      return;
     }
 
-    return currentFaceValues;
+    this.rotateMovableFaces(rotationKey, rotation[rotationKey]);
+    this.rotateAdjacentFaces(rotationKey, rotation[rotationKey]);
   }
 
-  private getNewCubeValues(
-    movableFaceValues: Face[],
-    positions: [number, number][][],
-    direction: boolean
-  ): FaceColor[] {
-    let allValues: FaceColor[] = movableFaceValues.reduce(
-      (_result, faceValue, faceIndex) => {
-        const columnValues: FaceColor[] = positions[faceIndex].map(
-          (position) => this.cubeData[faceValue - 1][position[1]][position[0]]
-        );
+  // rotate a column, row or layer
+  // x: left - right
+  // y: up - down
+  // z: zLeft - zRight
+  move(move: Coordinate<1 | -1>, rotationIndex: 0 | 1 | 2): void {
+    const moveKey: keyof Coordinate<any> | null = (() => {
+      if (move.x) {
+        return "x";
+      } else if (move.y) {
+        return "y";
+      } else if (move.z) {
+        return "z";
+      }
 
-        return [..._result, ...columnValues];
-      },
-      [] as FaceColor[]
+      return null;
+    })();
+
+    if (!moveKey || !move[moveKey]) {
+      return;
+    }
+
+    this.moveMovableFaces(moveKey, move[moveKey], rotationIndex);
+    this.moveAdjacentFaces(moveKey, move[moveKey], rotationIndex);
+  }
+
+  private rotateMovableFaces(
+    rotationKey: keyof Coordinate<any>,
+    rotationValue: number
+  ) {
+    const movableFaces = [...this.movableFaces[rotationKey]];
+    const movedFaces: MovableFacesValue = (() =>
+      (0 < rotationValue
+        ? [...movableFaces.slice(1, 4), movableFaces[0]]
+        : [
+            movableFaces[movableFaces.length - 1],
+            ...movableFaces.slice(0, 3),
+          ]) as MovableFacesValue)();
+    const movableFaceMapIndex: (keyof CubeMap)[] = movableFaces.map(
+      (face) => this.getFaceMapLocation(face)!
     );
 
-    if (direction) {
-      allValues = [
-        ...allValues.slice(3, allValues.length),
-        ...allValues.slice(0, 3),
-      ];
-    } else {
-      allValues = [
-        ...allValues.slice(allValues.length - 3, allValues.length),
-        ...allValues.slice(0, allValues.length - 3),
-      ];
+    const dataClone = [...this.data];
+    movableFaceMapIndex.map((faceMapIndex, index) => {
+      this.data[this.faceMap[faceMapIndex]] = dataClone[movedFaces[index]];
+      this.faceMap[faceMapIndex] = movedFaces[index];
+    });
+  }
+  private rotateAdjacentFaces(
+    rotationKey: keyof Coordinate<any>,
+    rotationValue: number
+  ) {
+    const moveRight = 0 < rotationValue;
+    const adjacentFaces = [...this.adjacentFaces[rotationKey]];
+
+    adjacentFaces.map((face, index) => {
+      const faceMapIndex = this.getFaceMapLocation(face)!;
+      this.data[this.faceMap[faceMapIndex]] = Matrix3.rotateZ(
+        index ? moveRight : !moveRight,
+        this.data[this.faceMap[faceMapIndex]]
+      );
+    });
+  }
+
+  private moveMovableFaces(
+    moveKey: keyof MovableFaces,
+    moveValue: 1 | -1,
+    rotationIndex: number
+  ): void {
+    const movableFaceMapIndex: (keyof CubeMap)[] = this.movableFaces[
+      moveKey
+    ].map((face) => this.getFaceMapLocation(face)!);
+    const movablePositions: ([number, number][] | null)[] =
+      movableFaceMapIndex.map((faceMapIndex) => {
+        switch (moveKey) {
+          case "x":
+            return Array(3)
+              .fill(0)
+              .map((_, index) =>
+                "back" !== faceMapIndex
+                  ? [rotationIndex, index]
+                  : [2 - rotationIndex, 2 - index]
+              );
+
+          case "y":
+            return Array(3)
+              .fill(0)
+              .map((_, index) => [index, rotationIndex]);
+
+          // not implemented
+          case "z":
+            switch (faceMapIndex) {
+              case "up":
+                return Array(3)
+                  .fill(0)
+                  .map((_, index) => [index, 2 - rotationIndex]);
+
+              case "left":
+                return Array(3)
+                  .fill(0)
+                  .map((_, index) => [2 - rotationIndex, 2 - index]);
+
+              case "down":
+                return Array(3)
+                  .fill(0)
+                  .map((_, index) => [2 - index, rotationIndex]);
+
+              case "right":
+                return Array(3)
+                  .fill(0)
+                  .map((_, index) => [rotationIndex, index]);
+            }
+
+          default:
+            return null;
+        }
+      });
+    const currentValues: CubeRowData[] = movablePositions.map(
+      (positions, index) => {
+        const faceIndex = this.faceMap[movableFaceMapIndex[index]];
+
+        return positions!.map(
+          (position) => this.data[faceIndex][position[1]][position[0]]
+        ) as CubeRowData;
+      }
+    );
+    const movedValues = (() =>
+      0 < moveValue
+        ? [...currentValues.slice(1, 4), currentValues[0]]
+        : [
+            currentValues[currentValues.length - 1],
+            ...currentValues.slice(0, 3),
+          ])();
+
+    movableFaceMapIndex.map((faceMapIndex, index) => {
+      const positions = movablePositions[index]!;
+      const faceIndex = this.faceMap[faceMapIndex];
+
+      positions.map((position, positionIndex) => {
+        this.data[faceIndex][position[1]][position[0]] =
+          movedValues[index][positionIndex];
+      });
+    });
+  }
+  private moveAdjacentFaces(
+    moveKey: keyof MovableFaces,
+    moveValue: 1 | -1,
+    rotationIndex: number
+  ): void {
+    let adjacentFace = null;
+    if (0 === rotationIndex) {
+      adjacentFace = this.adjacentFaces[moveKey]["x" === moveKey ? 0 : 1];
+    } else if (2 === rotationIndex) {
+      adjacentFace = this.adjacentFaces[moveKey]["x" === moveKey ? 1 : 0];
     }
 
-    return allValues;
+    if (null === adjacentFace) {
+      return;
+    }
+
+    const adjacentFaceMapIndex = this.getFaceMapLocation(adjacentFace)!;
+    const adjacentFaceIndex = this.faceMap[adjacentFaceMapIndex];
+
+    this.data[adjacentFaceIndex] = Matrix3.rotateZ(
+      0 === rotationIndex ? 0 < moveValue : !(0 < moveValue),
+      this.data[adjacentFaceIndex]
+    );
+  }
+
+  private getFaceMapLocation(face: CubeFace): keyof CubeMap | null {
+    const index = Object.values(this.faceMap).findIndex(
+      (faceValue) => face === faceValue
+    );
+
+    if (-1 === index) {
+      return null;
+    }
+
+    return Object.keys(this.faceMap)[index] as keyof CubeMap;
   }
 }
 
 export default Cube;
 
-export { RotationMove };
+export { CubeFace, Coordinate };
