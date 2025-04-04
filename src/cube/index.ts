@@ -199,7 +199,6 @@ class Cube {
   rotateFaces(rotationMove: RotationMove): void {
     this.updateFaceMap(rotationMove);
     this.updateRotation(rotationMove);
-    this.updateCubeData(rotationMove);
   }
 
   // ! missing rotate cube up > rotate row left | right
@@ -327,70 +326,6 @@ class Cube {
           }
         );
       }
-    });
-  }
-
-  private updateCubeData(rotationMove: RotationMove): void {
-    Object.keys(rotationMove).map((rotationKey) => {
-      const rotationValue = rotationMove[rotationKey as keyof RotationMove];
-
-      if (!rotationValue) {
-        return;
-      }
-
-      let updateCallback = null;
-
-      if (0 < rotationValue) {
-        updateCallback = (
-          _result: FaceData,
-          position: [number, number],
-          faceValue: FaceColor
-        ) => {
-          _result[position[0]][Math.abs(position[1] - 2)] = faceValue;
-        };
-      } else {
-        updateCallback = (
-          _result: FaceData,
-          position: [number, number],
-          faceValue: FaceColor
-        ) => {
-          _result[Math.abs(position[0] - 2)][position[1]] = faceValue;
-        };
-      }
-
-      const facesIndexToUpdate: number[] = ((): number[] => {
-        switch (rotationKey) {
-          case "x":
-            return [this.faceMap[0][1], this.faceMap[2][1]];
-
-          case "y":
-            return [this.faceMap[1][0], this.faceMap[1][2]];
-
-          case "z":
-            return [this.faceMap[1][1], this.faceMap[3][1]];
-
-          default:
-            return [];
-        }
-      })();
-
-      // facesIndexToUpdate.map((faceIndex) => {
-      //   this.cubeData[faceIndex] = [...this.cubeData[faceIndex]].reduce(
-      //     (_result, row, rowIndex) => {
-      //       row.map((faceValue, columnIndex) => {
-      //         //
-      //         updateCallback(_result, [columnIndex, rowIndex], faceValue);
-      //       });
-
-      //       return _result;
-      //     },
-      //     [
-      //       [FaceColor.None, FaceColor.None, FaceColor.None],
-      //       [FaceColor.None, FaceColor.None, FaceColor.None],
-      //       [FaceColor.None, FaceColor.None, FaceColor.None],
-      //     ] as FaceData
-      //   );
-      // });
     });
   }
 
